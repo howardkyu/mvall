@@ -10,7 +10,7 @@
 // arguments required.
 int verify_arguments(int argc) {
     if (argc-1 < 2) {
-        printf("Require at least 2 arguments. Received %i.\n", argc-1);
+        printf("At least 2 arguments are required. Received: %i.\n", argc-1);
         return 0;
     }
     return 1;
