@@ -19,6 +19,7 @@ static char* const PLEX_DIR_PATH = "INSERT PLEX PATH HERE";
 static char** keywords;
 static int keywords_size = 0;
 
+static int kword_flag = 0;
 static int plex_flag = 0;
 
 static char* path = "";
@@ -55,6 +56,7 @@ void get_args(int argc, char* argv[]) {
     while ((c = getopt(argc, argv, "k:P")) != -1) {
         switch (c) {
             case 'k':
+                kword_flag = 1;
                 parse_keywords(optarg);
                 break;
             case 'P':
@@ -135,20 +137,23 @@ main(int argc, char* argv[]) {
     d = opendir(".");
     if (d) {
         while ( (dir = readdir(d)) != NULL ) {
-            if (match_name(dir->d_name)) {
-                // Create new path for file/directory
-                char* dest_path = malloc(strlen(dest_dir_path)+1 * sizeof(char));
-                strcpy(dest_path, dest_dir_path);
-                strcat(dest_path, dir->d_name);
-
-                // Move file to new path
-                int status = rename(dir->d_name, dest_path);
-                if (status == 0) {
-                    printf("Successfully moved %s to %s.\n", dir->d_name, dest_path);
-                } else {
-                    printf("Move failed: %s.\n", strerror(errno));
-                }
+            if (kword_flag && !match_name(dir->d_name)) {
+                continue;       /* Skip file if name does not match keywords */
             }
+
+            // Create new path for file/directory
+            char* dest_path = malloc(strlen(dest_dir_path)+1 * sizeof(char));
+            strcpy(dest_path, dest_dir_path);
+            strcat(dest_path, dir->d_name);
+
+            printf("%s\n", dest_path); 
+            // // Move file to new path
+            // int status = rename(dir->d_name, dest_path);
+            // if (status == 0) {
+            //     printf("Successfully moved %s to %s.\n", dir->d_name, dest_path);
+            // } else {
+            //     printf("Move failed: %s.\n", strerror(errno));
+            // }
         }
 
         closedir(d);
