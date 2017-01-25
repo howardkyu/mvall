@@ -137,6 +137,10 @@ main(int argc, char* argv[]) {
     d = opendir(".");
     if (d) {
         while ( (dir = readdir(d)) != NULL ) {
+            if (dir->d_name[0] == '.') {
+                continue;       /* Skip file if name starts with "." */
+            }
+            
             if (kword_flag && !match_name(dir->d_name)) {
                 continue;       /* Skip file if name does not match keywords */
             }
