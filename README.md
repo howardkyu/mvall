@@ -5,8 +5,8 @@ usage: mvall [-k keywords] [-P Plex] path
 
 Examples:
 
-mvall ~Documents/my-folder
-mvall my-next-folder
-mvall -k "my project" ~Documents/my-projects
-mvall -k "my movie" -P movies
-mvall -k "my tv show" -P tv-shows
+mvall ~Documents/my-folder\n
+mvall my-next-folder\n
+mvall -k "my project" ~Documents/my-projects\n
+mvall -k "my movie" -P movies\n
+mvall -k "my tv show" -P tv-shows\n
