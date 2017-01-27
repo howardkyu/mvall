@@ -30,12 +30,11 @@ static int keywords_size = 0;
 
 static char* extension;
 
-static char* path = "";
-static char* dest_dir_path;
+static char* dir_path;
 
 /* Parse extensions from a string of exactly one extension */
 void parse_extensions(char* ext) {
-    extension = malloc((strlen(ext))+1 * sizeof(char));
+    extension = malloc((strlen(ext))+2 * sizeof(char));
     if (ext[0] != '.') {
         strcpy(extension, ".");
     }
@@ -63,6 +62,25 @@ void parse_keywords(char* keywords_str) {
     keywords_size = i;
 }
 
+/* Generate the path to the destination directory */
+void generate_dir_path(char* path) {
+    dir_path = malloc(strlen(PLEX_DIR_PATH)+strlen(path)+3 * sizeof(char));
+    if (plex_flag) {
+        strcpy(dir_path, PLEX_DIR_PATH);
+        if (path[0] != '/') {
+            strcat(dir_path, "/");
+        }
+    }
+
+    strcat(dir_path, path);
+    
+    // Add '/' to the end of the path if not present
+    if (dir_path[strlen(dir_path)-1] != '/') {
+        strcat(dir_path, "/");
+    }
+}
+
+
 /* Parse command line arguments */
 void get_args(int argc, char* argv[]) {
     extern char* optarg;
@@ -89,6 +107,11 @@ void get_args(int argc, char* argv[]) {
         }
     }
 
+    if (err) {
+        fprintf(stderr, usage, argv[0]);
+        exit(0);
+    }
+
     if (optind == argc) {               /* path not found */
         fprintf(stderr, "%s: missing path\n", argv[0]);
         fprintf(stderr, usage, argv[0]);
@@ -97,29 +120,8 @@ void get_args(int argc, char* argv[]) {
         fprintf(stderr, "%s: more than one path specified\n", argv[0]);
         fprintf(stderr, usage, argv[0]);
         exit(0);
-    } else if (err){
-        fprintf(stderr, usage, argv[0]);
-        exit(0);
-    } else {
-        path = argv[optind];
-    }
-}
-
-/* Generate the path to the destination directory*/
-void generate_dest_dir_path() {
-    dest_dir_path = malloc(strlen(PLEX_DIR_PATH)+strlen(path)+3 * sizeof(char));
-    if (plex_flag) {
-        strcpy(dest_dir_path, PLEX_DIR_PATH);
-        if (path[0] != '/') {
-            strcat(dest_dir_path, "/");
-        }
-    }
-
-    strcat(dest_dir_path, path);
-    
-    // Add '/' to the end of the path if not present
-    if (dest_dir_path[strlen(dest_dir_path)-1] != '/') {
-        strcat(dest_dir_path, "/");
+    } else {        /* only one path given */
+        generate_dir_path(argv[optind]);
     }
 }
 
@@ -160,9 +162,6 @@ main(int argc, char* argv[]) {
     // Get command line arguments
     get_args(argc, argv);
 
-    // Generate path to destination directory
-    generate_dest_dir_path();
-
     // Open directory
     DIR *d;
     struct dirent *dir;
@@ -182,17 +181,17 @@ main(int argc, char* argv[]) {
             }
 
             // Create new path for file/directory
-            char* dest_path = malloc(strlen(dest_dir_path)+1 * sizeof(char));
-            strcpy(dest_path, dest_dir_path);
+            char* dest_path = malloc(strlen(dir_path)+1 * sizeof(char));
+            strcpy(dest_path, dir_path);
             strcat(dest_path, dir->d_name);
 
-            // // Move file to new path
-            // int status = rename(dir->d_name, dest_path);
-            // if (status == 0) {
-            //     printf("Successfully moved %s to %s.\n", dir->d_name, dest_path);
-            // } else {
-            //     printf("Move failed: %s.\n", strerror(errno));
-            // }
+            // // // Move file to new path
+            // // int status = rename(dir->d_name, dest_path);
+            // // if (status == 0) {
+            // //     printf("Successfully moved %s to %s.\n", dir->d_name, dest_path);
+            // // } else {
+            // //     printf("Move failed: %s.\n", strerror(errno));
+            // // }
             printf("%s\n", dest_path);
         }
 
