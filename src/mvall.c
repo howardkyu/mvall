@@ -64,9 +64,10 @@ void parse_keywords(char* keywords_str) {
 
 /* Generate the path to the destination directory */
 void generate_dir_path(char* path) {
-    dir_path = malloc(strlen(PLEX_DIR_PATH)+strlen(path)+3 * sizeof(char));
+    dir_path = malloc((strlen(PLEX_DIR_PATH)+strlen(path)+3) * sizeof(char));
+    dir_path[0] = '\0';
     if (plex_flag) {
-        strcpy(dir_path, PLEX_DIR_PATH);
+        strcat(dir_path, PLEX_DIR_PATH);
         if (path[0] != '/') {
             strcat(dir_path, "/");
         }
@@ -181,7 +182,7 @@ main(int argc, char* argv[]) {
             }
 
             // Create new path for file/directory
-            char* dest_path = malloc(strlen(dir_path)+1 * sizeof(char));
+            char* dest_path = malloc((strlen(dir_path)+strlen(dir->d_name)+1) * sizeof(char));
             strcpy(dest_path, dir_path);
             strcat(dest_path, dir->d_name);
 
